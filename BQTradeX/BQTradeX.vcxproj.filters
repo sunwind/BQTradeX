@@ -42,7 +42,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Debug\BQTradeXDemo.py">
+    <None Include="BQTradeXDemo.py">
       <Filter>PyDemo</Filter>
     </None>
   </ItemGroup>

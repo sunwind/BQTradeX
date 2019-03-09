@@ -156,7 +156,7 @@
     <ResourceCompile Include="BQTradeX.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Debug\BQTradeXDemo.py" />
+    <None Include="BQTradeXDemo.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
