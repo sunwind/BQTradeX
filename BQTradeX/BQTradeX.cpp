@@ -34,6 +34,8 @@ static std::mutex g_Mutex;
 
 static bool _out2stdout = false;
 
+static int32_t _loadconfig = 0;
+
 static int32_t g_ClientId = 1;
 static int32_t g_OrderId = 1;
 static int32_t g_MatchId = 1;
@@ -187,6 +189,12 @@ static void _MatchOrder(const char* apStockCode, double lastprice, int lastvol, 
 
 void BQTRADEX_API WINAPI OpenTdx()
 {
+    if (!_loadconfig)
+    {
+        _loadconfig = 1;
+        extern int ReadConfig(const char*);
+        ReadConfig("init_tradex_data.json");
+    }
     LoadQuote(NULL);
 }
 

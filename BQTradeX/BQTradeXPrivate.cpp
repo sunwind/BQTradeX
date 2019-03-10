@@ -1,4 +1,12 @@
+#include <stdio.h>
+#include <string>
+#include "json.hpp"
+
+#include "BQTradeX.h"
 #include "BQTradeXPrivate.h"
+
+using namespace std;
+using json = nlohmann::json;
 
 
 int StockPoistionUpdate(TradeXPosition* pos, int direction, int32_t volume, double price, bool istransaction)
@@ -56,3 +64,28 @@ int StockPositionUnfrozen(TradeXPosition* pos, int32_t volume)
     pos->m_FrozenSize -= volume;
     return 1;
 }
+
+
+
+int BQTRADEX_API ReadConfig(const char* filename)
+{
+    char buf[8192] = "";
+    FILE* fp = fopen(filename, "r");
+    if (!fp)
+    {
+        fprintf(stderr, "open config file %s failed!\n", filename);
+        return -1;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    int sz = (int)ftell(fp);
+
+    fseek(fp, 0, SEEK_SET);
+    int readlen = fread(buf, sz, 1, fp);
+
+    auto j3 = json::parse(buf);
+
+    fclose(fp);
+    return 0;
+}
+

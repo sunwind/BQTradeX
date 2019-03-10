@@ -1,0 +1,24 @@
+{
+    "default_cash": 200000,
+    "trading_account":
+    {
+        "accountID": "1650002099",
+        "cash": 100000, 
+        "cash_avail" : 100000
+    },
+
+    "position": [
+        {
+            "stock": "600569",
+            "stockName": "安阳钢铁", 
+            "currentQty" : 400,
+            "costPrice": 4.13
+        },
+        {
+            "stock": "600446",
+            "stockName": "金证股份", 
+            "currentQty" : 600,
+            "costPrice": 16.78
+        }
+    ]
+}
