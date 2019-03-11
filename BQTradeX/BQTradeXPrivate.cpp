@@ -67,7 +67,7 @@ int StockPositionUnfrozen(TradeXPosition* pos, int32_t volume)
 
 
 
-int BQTRADEX_API ReadConfig(const char* filename)
+int BQTRADEX_API ReadConfig(const char* filename, double* apDefaultCash)
 {
     char buf[8192] = "";
     FILE* fp = fopen(filename, "r");
@@ -84,6 +84,29 @@ int BQTRADEX_API ReadConfig(const char* filename)
     int readlen = fread(buf, sz, 1, fp);
 
     auto j3 = json::parse(buf);
+
+    double default_cash = j3["default_cash"];
+    if (default_cash > 0 && apDefaultCash) {
+        *apDefaultCash = default_cash;
+    }
+
+    json trading_account = j3["trading_account"];
+    string accountID = trading_account["accountID"];
+    double cash = trading_account["cash"];
+    double cash_avail = trading_account["cash_avail"];
+
+    json positions = j3["position"];
+    sz = (int)positions.size();
+
+    for (int i = 0; i < sz; ++i)
+    {
+        json pos = positions[i];
+        string stock = pos["stock"];
+        int currentQty = pos["currentQty"];
+        double costPrice = pos["costPrice"];
+        string stockName = pos["stockName"];
+        int x = 0;
+    }
 
     fclose(fp);
     return 0;

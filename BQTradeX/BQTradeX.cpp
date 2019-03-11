@@ -28,6 +28,8 @@ using namespace std;
  * 行情查询，当前只有两支股票的数据，未来可通过从文件加载等方式
  */
 
+static const char* version = "0.1.0";
+
 static std::mutex g_Mutex;
 
 #define BQTRADEX_SCOPE_LOCK std::lock_guard<mutex> lk(g_Mutex)
@@ -35,6 +37,9 @@ static std::mutex g_Mutex;
 static bool _out2stdout = false;
 
 static int32_t _loadconfig = 0;
+static const char* config_file = "init_tradex_data.json";
+static double _defaultCash = 500000;
+
 
 static int32_t g_ClientId = 1;
 static int32_t g_OrderId = 1;
@@ -112,10 +117,10 @@ public:
         strcpy(lAccount.m_AccountNo, apAccountNo);
         strcpy(lAccount.m_TradeAccount, apAccountNo);
         strcpy(lAccount.m_Currency, "CNY");
-        lAccount.m_TotalAsset = 1000000.0;
-        lAccount.m_UsableMoney = 1000000.0;
+        lAccount.m_TotalAsset = _defaultCash;
+        lAccount.m_UsableMoney = _defaultCash;
         lAccount.m_PositionValue = 0;
-        lAccount.m_BalanceMoney = 1000000.0;
+        lAccount.m_BalanceMoney = _defaultCash;
         lAccount.m_FrozenMoney = 0.0;
         lAccount.m_OnwayMoney = 25000;
     }
@@ -123,6 +128,7 @@ public:
     {
         if (strcmp(m_TradingAccount.m_AccountNo, "1650002099") == 0)
         {
+#if 0
             TradeXPosition& lPosition = *GetPosition("600569", true);
             memset(&lPosition, 0, sizeof(lPosition));
             lPosition.m_ClientID = ClientID();
@@ -138,6 +144,7 @@ public:
             lAccount.m_UsableMoney = 800000;
             lAccount.m_BalanceMoney = 800000;
             lAccount.m_TotalAsset = lAccount.m_BalanceMoney + lPosition.m_MarketValue;
+#endif//0
         }
     }
 
@@ -189,11 +196,12 @@ static void _MatchOrder(const char* apStockCode, double lastprice, int lastvol, 
 
 void BQTRADEX_API WINAPI OpenTdx()
 {
+    LogDebug(0, "-------- OpenTdx %s --------", version);
     if (!_loadconfig)
     {
         _loadconfig = 1;
-        extern int ReadConfig(const char*);
-        ReadConfig("init_tradex_data.json");
+        extern int ReadConfig(const char*, double*);
+        ReadConfig(config_file, &_defaultCash);
     }
     LoadQuote(NULL);
 }
