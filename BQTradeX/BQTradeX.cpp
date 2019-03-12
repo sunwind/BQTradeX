@@ -341,7 +341,8 @@ void BQTRADEX_API WINAPI QueryData(
 
         //strcpy(lBuffer, "证券代码\t证券名称\t证券数量\t持仓量\t可卖数量\t当前价\t最新市值\t成本价\t浮动盈亏\t盈亏比例(%)\t"
         //    "帐号类别\t资金账号\t股东代码\t交易所名称\t买卖标志\t投保标志\t今买数量\t今卖数量\t保证金\t保留信息\n");
-        strcpy(lBuffer, "证券代码\t证券名称\tDirectin\t证券数量\t可卖数量\t最新市值\t成本价\t保留信息\n");
+        // strcpy(lBuffer, "证券代码\t证券名称\tDirectin\t证券数量\t可卖数量\t最新市值\t成本价\t保留信息\n");
+        strcpy(lBuffer, "证券代码\t证券名称\tDirectin\t今余额\t可卖量\t冻结数量\t市值\t买入金额\n");
         lLength = (int)strlen(lBuffer);
 
         PositionMap& lPositions = lpClient->Positoins();
@@ -352,8 +353,10 @@ void BQTRADEX_API WINAPI QueryData(
                 continue;
             }
 
-            lLength += sprintf(lBuffer + lLength, "%s\t%s\t0\t%d\t%d\t%.2lf\t%.3lf\ta\n", lpPos->m_Stock, lpPos->m_StockName,
-                lpPos->m_TotalSize, lpPos->m_CoverableSize, lpPos->m_MarketValue, lpPos->m_CostBasis);
+            // lLength += sprintf(lBuffer + lLength, "%s\t%s\t0\t%d\t%d\t%.2lf\t%.3lf\ta\n", lpPos->m_Stock, lpPos->m_StockName,
+            //    lpPos->m_TotalSize, lpPos->m_CoverableSize, lpPos->m_MarketValue, lpPos->m_CostBasis);
+            lLength += sprintf(lBuffer + lLength, "%s\t%s\t0\t%d\t%d\t%d\t%.2lf\t%.3lf\n", lpPos->m_Stock, lpPos->m_StockName,
+                lpPos->m_TotalSize, lpPos->m_CoverableSize, lpPos->m_FrozenSize, lpPos->m_MarketValue, lpPos->m_CostBasis);
 
             LogDebug(0, "position: %s,%d,%.2lf\n", lpPos->m_Stock, lpPos->m_TotalSize, lpPos->m_CostBasis);
         }
@@ -366,8 +369,8 @@ void BQTRADEX_API WINAPI QueryData(
         /* query all orders of this trading day, 
          * FIXME:每个券商的返回的格式可能不一样
          */
-        strcpy(lBuffer, "证券代码\t证券名称\t买卖标志\t委托类别\t委托价格\t委托数量\t状态说明\t成交数量\t委托编号\t委托时间\n");
-        //strcpy(lBuffer, "证券代码\t证券名称\t买卖标志\t委托价格\t委托数量\t状态说明\t成交数量\t委托编号\t委托时间");
+         //strcpy(lBuffer, "证券代码\t证券名称\t买卖标志\t委托类别\t委托价格\t委托数量\t状态说明\t成交数量\t委托编号\t委托时间\n");
+        strcpy(lBuffer, "证券代码\t证券名称\t买卖标志\t委托价格\t委托数量\t状态说明\t成交数量\t委托编号\t委托时间\n");
         lLength = (int)strlen(lBuffer);
 
         OrderContainer& lOrders = lpClient->Orders();
@@ -384,17 +387,18 @@ void BQTRADEX_API WINAPI QueryData(
             ConvertTime(lOrderTime, iter->m_InsertTime);
             const char* lpStatusDesc = GetStatusDesc(iter->m_Status);
             const char* lpDirectionDesc = GetDirectionDesc(iter->m_Direction);
-            const char* lpCategory = GetPriceTypeDesc(iter->m_PriceType);
-            lLength += sprintf(lBuffer + lLength, "%s\t%s\t%s\t%s\t%.2f\t%d\t%s\t%d\t%04d\t%s\n", iter->m_Stock, iter->m_StockName,
-            //lLength += sprintf(lBuffer + lLength, "%s\t%s\t%s\t%.2f\t%d\t%s\t%d\t%04d\t%s\n", iter->m_Stock, iter->m_StockName,
-                lpDirectionDesc, lpCategory, iter->m_Price, iter->m_Quantity, lpStatusDesc, iter->m_Filled, iter->m_OrderID, lOrderTime);
+            //const char* lpCategory = GetPriceTypeDesc(iter->m_PriceType);
+            //lLength += sprintf(lBuffer + lLength, "%s\t%s\t%s\t%s\t%.2f\t%d\t%s\t%d\t%04d\t%s\n", iter->m_Stock, iter->m_StockName,
+            //    lpDirectionDesc, lpCategory, iter->m_Price, iter->m_Quantity, lpStatusDesc, iter->m_Filled, iter->m_OrderID, lOrderTime);
+            lLength += sprintf(lBuffer + lLength, "%s\t%s\t%s\t%.2f\t%d\t%s\t%d\t%04d\t%s\n", iter->m_Stock, iter->m_StockName,
+                lpDirectionDesc, iter->m_Price, iter->m_Quantity, lpStatusDesc, iter->m_Filled, iter->m_OrderID, lOrderTime);
         }
 
         if (lCount == 0)
         {
             // no orders ...
             LogDebug(0, "QueryData(2order) no orders for clientId:%d\n", nClientID);
-            sprintf(pszErrInfo, "QueryData(order) no orders for clientId:%d\n", nClientID);
+            // sprintf(pszErrInfo, "QueryData(order) no orders for clientId:%d\n", nClientID);
         }
         else
         {
@@ -438,7 +442,8 @@ void BQTRADEX_API WINAPI QueryData(
     else if (nCategory == CATEGORY_QUERY_PENDINGORDER)
     {
         /* only query pending orders */
-        strcpy(lBuffer, "证券代码\t证券名称\t买卖标志\t委托类别\t委托价格\t委托数量\t成交数量\t委托编号\t委托时间\n");
+        // strcpy(lBuffer, "证券代码\t证券名称\t买卖标志\t委托类别\t委托价格\t委托数量\t成交数量\t委托编号\t委托时间\n");
+        strcpy(lBuffer, "证券代码\t证券名称\t买卖标志\t委托价格\t委托数量\t状态说明\t成交数量\t委托编号\t委托时间\n");
         lLength = (int)strlen(lBuffer);
 
         OrderContainer& lOrders = lpClient->Orders();
